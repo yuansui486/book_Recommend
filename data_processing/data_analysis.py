@@ -1,4 +1,7 @@
 from pyspark.sql import SparkSession
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
 
 # 初始化 SparkSession 并连接到 Hive
 spark = SparkSession.builder \
@@ -23,6 +26,34 @@ books_df.describe('price').show()
 # 统计分析：评分人数的分布情况
 books_df.describe('num').show()
 
+# 转换为Pandas DataFrame
+books_pd_df = books_df.toPandas()
 # 关闭 Spark
 spark.stop()
 
+# 绘制评分的分布情况
+plt.figure(figsize=(10, 6))
+plt.hist(books_pd_df['score'].dropna(), bins=10, edgecolor='black')
+plt.title('书籍评分分布')  # 标题
+plt.xlabel('评分')  # x轴标签
+plt.ylabel('频率')  # y轴标签
+plt.grid(True)
+plt.show()
+
+# 绘制价格的分布情况
+plt.figure(figsize=(10, 6))
+plt.hist(books_pd_df['price'].dropna(), bins=10, edgecolor='black')
+plt.title('书籍价格分布')  # 标题
+plt.xlabel('价格（元）')  # x轴标签
+plt.ylabel('频率')  # y轴标签
+plt.grid(True)
+plt.show()
+
+# 绘制评分人数的分布情况
+plt.figure(figsize=(10, 6))
+plt.hist(books_pd_df['num'].dropna(), bins=10, edgecolor='black')
+plt.title('评分人数分布')  # 标题
+plt.xlabel('评分人数')  # x轴标签
+plt.ylabel('频率')  # y轴标签
+plt.grid(True)
+plt.show()
