@@ -1,8 +1,8 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 # 读取爬取到的图书数据
-df = pd.read_json('../data/data.json',lines=True)
+df = pd.read_json('../data/data.json', lines=True)
 
 # 数据清洗
 
@@ -31,26 +31,26 @@ pd.set_option('display.max_colwidth', 100)
 print("清洗后的数据示例：")
 print(df_cleaned.head(10))
 
-# # 连接 Hive
-# engine = create_engine('hive://username@hive-server:10000/default')
-#
-# # 创建 Hive 表（如果不存在）
-# with engine.connect() as conn:
-#     conn.execute('''
-#         CREATE TABLE IF NOT EXISTS books_data (
-#             title STRING,
-#             s_img STRING,
-#             scrible STRING,
-#             author STRING,
-#             publisher STRING,
-#             pub_date STRING,
-#             price FLOAT,
-#             score FLOAT,
-#             num INT
-#         )
-#     ''')
-#
-# # 将清洗后的数据写入 Hive
-# df.to_sql('books_data', engine, if_exists='append', index=False)
-#
-# print("数据清洗并存储到Hive完成")
+# 连接 Hive
+engine = create_engine('hive://root@192.168.128.130:10000/default')
+
+# 创建 Hive 表（如果不存在）
+with engine.connect() as conn:
+    conn.execute(text('''
+        CREATE TABLE IF NOT EXISTS books_data (
+            title STRING,
+            s_img STRING,
+            scrible STRING,
+            author STRING,
+            publisher STRING,
+            pub_date STRING,
+            price FLOAT,
+            score FLOAT,
+            num INT
+        )
+    '''))
+
+# 将清洗后的数据写入 Hive
+df_cleaned.to_sql('books_data', engine, if_exists='append', index=False)
+
+print("数据清洗并存储到Hive完成")
