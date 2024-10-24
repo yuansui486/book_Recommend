@@ -13,23 +13,35 @@ df['price'] = pd.to_numeric(df['price'].str.replace('元', ''), errors='coerce')
 df['score'] = pd.to_numeric(df['score'], errors='coerce')
 
 # 3. 处理出版日期列
-# 第一步：解析完整的 YYYY-MM-DD 格式日期
-df['pub_date'] = pd.to_datetime(df['pub_date'], errors='coerce')
 
-# 第二步：对于解析失败的行（NaT 值），提取 YYYY-MM 格式并将其补全为 YYYY-MM-01
-mask = df['pub_date'].isna()  # 查找解析失败的行
-date_str = df.loc[mask, 'pub_date'].astype(str).str.extract(r'(\d{4}-\d{1,2})')[0]  # 提取年份和月份
-df.loc[mask, 'pub_date'] = pd.to_datetime(date_str + '-01', errors='coerce')  # 补全为该月的第一天
+def parse_pub_date(date_str):
+    try:
+        # 尝试完整格式 YYYY-MM-DD
+        return pd.to_datetime(date_str, format='%Y-%m-%d', errors='raise')
+    except:
+        try:
+            # 如果失败，尝试 YYYY-MM
+            return pd.to_datetime(date_str, format='%Y-%m', errors='raise')
+        except:
+            try:
+                # 如果失败，尝试 YYYY
+                return pd.to_datetime(date_str, format='%Y', errors='coerce')
+            except:
+                return pd.NaT  # 如果解析失败，返回 NaT
+
+# 应用日期解析函数
+df['pub_date'] = df['pub_date'].apply(parse_pub_date)
+
 
 # 4. 删除在重要列中存在缺失值的行
-df_cleaned = df.dropna(subset=['title', 'author', 'price', 'score', 'pub_date'])
+df_cleaned = df.dropna(subset=['title', 'author','pub_date' ,'price', 'score'])
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_colwidth', 100)
 
 print("清洗后的数据示例：")
-print(df_cleaned.head(10))
+print(df_cleaned.head(100))
 
 # 连接 Hive
 # engine = create_engine('hive://root@192.168.128.130:10000/default')
@@ -52,6 +64,8 @@ print(df_cleaned.head(10))
 
 
 df_cleaned.to_csv('../data/cleaned_books_data.csv', index=False)
+print("处理后的数据行数：", df.shape[0])
+print("清洗后的数据行数：", df_cleaned.shape[0])
 
 # # 将清洗后的数据写入 Hive
 # df_cleaned.to_sql('books_data', engine, if_exists='append', index=False)
