@@ -1,4 +1,3 @@
-user_id,book_id,action,rating,event_timestamp
 456,9,view,,1729823972
 387,88,view,,1729823972
 320,30,click,,1729823972
