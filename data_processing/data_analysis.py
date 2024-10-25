@@ -32,28 +32,29 @@ books_pd_df = books_df.toPandas()
 spark.stop()
 
 # 绘制评分的分布情况
+# 评分分布图（范围8.5到9.5）
 plt.figure(figsize=(10, 6))
-plt.hist(books_pd_df['score'].dropna(), bins=10, edgecolor='black')
-plt.title('书籍评分分布')  # 标题
-plt.xlabel('评分')  # x轴标签
-plt.ylabel('频率')  # y轴标签
+plt.hist(books_pd_df['score'].dropna(), bins=10, range=(8.5, 9.5), edgecolor='black')
+plt.title('书籍评分分布（8.5-9.5）')
+plt.xlabel('评分')
+plt.ylabel('频率')
 plt.grid(True)
 plt.show()
 
-# 绘制价格的分布情况
+# 价格分布图
 plt.figure(figsize=(10, 6))
 plt.hist(books_pd_df['price'].dropna(), bins=10, edgecolor='black')
-plt.title('书籍价格分布')  # 标题
-plt.xlabel('价格（元）')  # x轴标签
-plt.ylabel('频率')  # y轴标签
+plt.title('书籍价格分布')
+plt.xlabel('价格（元）')
+plt.ylabel('频率')
 plt.grid(True)
 plt.show()
 
-# 绘制评分人数的分布情况
+# 评分人数分布图
 plt.figure(figsize=(10, 6))
 plt.hist(books_pd_df['num'].dropna(), bins=10, edgecolor='black')
-plt.title('评分人数分布')  # 标题
-plt.xlabel('评分人数')  # x轴标签
-plt.ylabel('频率')  # y轴标签
+plt.title('评分人数分布')
+plt.xlabel('评分人数')
+plt.ylabel('频率')
 plt.grid(True)
 plt.show()
